@@ -1,0 +1,67 @@
+# ===========================================================================
+# 自动询价系统 · 容器应用层 + Windows 宿主控制代理
+#
+# 启动顺序：
+#   1. 在用户桌面会话中运行 deploy/start-host-agent.ps1
+#   2. 再运行 docker compose --env-file .env -f deploy/docker-compose.yml up -d --build
+#
+# Chrome、monitor、Node bridge 和 im.db 都留在宿主机。容器不执行 PowerShell，
+# 也不挂载 WAL 数据库；它通过 host.docker.internal:7400 调宿主代理，并读取
+# 代理生成的 im.db 快照。
+# ===========================================================================
+name: automatic-inquiry
+
+services:
+  ais:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        NODE_BASE: ${AIS_NODE_BASE:-node:22-bookworm-slim}
+        PYTHON_BASE: ${AIS_PYTHON_BASE:-python:3.12-slim}
+    image: automatic-inquiry-system:1.0.0
+    container_name: automatic-inquiry-system
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-6900}:${APP_PORT:-6900}"
+    environment:
+      TZ: Asia/Shanghai
+      APP_PORT: ${APP_PORT:-6900}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-please-use-random-string}
+      PORTAL_API_BASE_URL: ${PORTAL_API_BASE_URL:-http://192.168.40.194:6690}
+      SSO_LOGIN_URL: ${SSO_LOGIN_URL:-http://192.168.40.194:6690/login}
+      SSO_CALLBACK_URL: ${SSO_CALLBACK_URL:-http://192.168.40.194:6900/api/auth/sso/callback}
+      PORTAL_LOGOUT_URL: ${PORTAL_LOGOUT_URL:-http://192.168.40.194:6690/logout}
+      SSO_COOKIE_SECURE: ${SSO_COOKIE_SECURE:-false}
+      ALLOW_DEV_LOGIN: ${ALLOW_DEV_LOGIN:-false}
+      SEND_MODE: ${SEND_MODE:-send}
+      REQUIRE_SEND_CONFIRM: ${REQUIRE_SEND_CONFIRM:-true}
+      MONITOR_INTERVAL_SEC: ${MONITOR_INTERVAL_SEC:-15}
+      MONITOR_REFRESH_MIN: ${MONITOR_REFRESH_MIN:-0}
+      CDP_BASE: http://host.docker.internal:6901
+      HOST_AGENT_URL: http://host.docker.internal:${HOST_AGENT_PORT:-7400}
+      HOST_AGENT_TOKEN: ${HOST_AGENT_TOKEN:?HOST_AGENT_TOKEN is required; run deploy/start-host-agent.ps1 once}
+      HOST_AGENT_STATUS_INTERVAL_SEC: ${HOST_AGENT_STATUS_INTERVAL_SEC:-2}
+      HOST_AGENT_SNAPSHOT_INTERVAL_SEC: ${HOST_AGENT_SNAPSHOT_INTERVAL_SEC:-2}
+      PROJECT_ROOT: /app/project
+      IM_DB: /app/data/im.snapshot.db
+      IMAGE_DIR: /app/project/tools/qianniu/image
+      PHRASE_LIB: /app/project/tools/qianniu/phrase-library.json
+    volumes:
+      - "../../tools/qianniu/image:/app/project/tools/qianniu/image"
+      - "../../tools/qianniu/phrase-library.json:/app/project/tools/qianniu/phrase-library.json"
+      - "../../tools/qianniu/knowledge:/app/project/tools/qianniu/knowledge:ro"
+      # SQLite WAL 不兼容 Docker Desktop 的 Windows 绑定目录，因此运行时数据
+      # 必须放在命名卷。宿主 data 目录用于备份/恢复（deploy/merge-api-db.py）。
+      - ais_data:/app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "healthcheck.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  ais_data:
+

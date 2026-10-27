@@ -1,0 +1,941 @@
+:root {
+  --brand: #3b6fe0;
+  --ink: #1b2437;
+  --ink-soft: #5a6b85;
+  --line: #e8ecf3;
+  --bg: #f2f4f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c9d2e0;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #aab7cb;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------------- 布局 ---------------- */
+.ais-layout {
+  min-height: 100vh;
+}
+
+.ais-sider {
+  position: fixed !important;
+  inset: 0 auto 0 0;
+  z-index: 20;
+  background: linear-gradient(180deg, #18213a 0%, #101828 100%) !important;
+  box-shadow: 2px 0 12px rgba(9, 14, 26, 0.18);
+}
+
+/* antd 把侧边栏内容包在 .ant-layout-sider-children 里，
+   flex 布局必须加在这一层，否则"菜单可滚动 + 底部常驻"不会生效 */
+.ais-sider > .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.ais-brand {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.ais-brand-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  background: linear-gradient(135deg, #4f8bff 0%, #7a5af8 100%);
+  box-shadow: 0 4px 10px rgba(79, 139, 255, 0.35);
+}
+
+.ais-brand-text {
+  line-height: 1.15;
+}
+
+.ais-brand-text b {
+  font-size: 14px;
+  letter-spacing: 0.4px;
+}
+
+.ais-brand-text span {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ais-sider-foot {
+  padding: 12px 12px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  flex: none;
+}
+
+/* 侧边栏里的当前用户卡片 */
+.ais-user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 12px 4px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex: none;
+}
+
+.ais-user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ais-user-role {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 菜单区：可滚动，底部信息永远贴在下面 */
+.ais-menu-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 4px;
+}
+
+.ais-menu-wrap::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* 底部开发者入口（对齐企业门户） */
+.ais-dev-link {
+  display: block;
+  text-align: center;
+  font-size: 11px;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  padding: 2px 0;
+  transition: color 0.2s;
+}
+
+.ais-dev-link:hover {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.ais-dev-link code {
+  font-size: 11px;
+  color: inherit;
+  background: transparent;
+  padding: 0;
+}
+
+.ais-copy {
+  text-align: center;
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 8px;
+}
+
+.ais-main {
+  margin-left: 216px;
+  transition: margin-left 0.2s;
+}
+
+.ais-header {
+  height: 60px;
+  padding: 0 20px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.ais-header-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ais-header-sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-left: 10px;
+  font-weight: 400;
+}
+
+.ais-content {
+  padding: 18px 20px 34px;
+}
+
+/* ---------------- 通用块 ---------------- */
+.ais-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 14px rgba(16, 24, 40, 0.045);
+}
+
+.ais-stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  height: 100%;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.ais-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(16, 24, 40, 0.1);
+}
+
+.ais-stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 21px;
+  color: #fff;
+  flex: none;
+}
+
+.ais-stat-value {
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.4px;
+}
+
+.ais-stat-label {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.ais-health-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 13px;
+}
+
+.ais-health-row:last-child {
+  border-bottom: none;
+}
+
+.ais-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 7px;
+}
+
+.ais-dot.ok {
+  background: #18a058;
+  box-shadow: 0 0 0 3px rgba(24, 160, 88, 0.16);
+}
+
+.ais-dot.bad {
+  background: #e5534b;
+  box-shadow: 0 0 0 3px rgba(229, 83, 75, 0.16);
+}
+
+.ais-dot.warn {
+  background: #e6a23c;
+  box-shadow: 0 0 0 3px rgba(230, 162, 60, 0.18);
+}
+
+.ais-dot.idle {
+  background: #b0b9c9;
+  box-shadow: 0 0 0 3px rgba(176, 185, 201, 0.18);
+}
+
+/* 状态监控页：体检原始结果（JSON）与说明文字 */
+.ais-json {
+  margin: 0;
+  padding: 12px 14px;
+  background: #f7f9fc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #33415c;
+  max-height: 260px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* 最近事件（新闻）：限高（占视口百分比）＋ 最多可见 4 条，滚轮查看更多 */
+.ais-news {
+  --ais-news-row: 64px;
+  max-height: min(40vh, calc(var(--ais-news-row) * 4));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ais-news::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ais-news::-webkit-scrollbar-thumb {
+  background: #d5dbe6;
+  border-radius: 4px;
+}
+
+.ais-news::-webkit-scrollbar-thumb:hover {
+  background: #bcc5d6;
+}
+
+.ais-news .ant-list-item {
+  display: block;
+  min-height: var(--ais-news-row);
+  padding: 9px 16px;
+  border-block-end: none;
+}
+
+.ais-news .ant-list-item + .ant-list-item {
+  border-top: 1px solid #f0f3f8;
+}
+
+.ais-news-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ais-news-line > .ant-typography {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ais-news-time {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: #a8b3c6;
+}
+
+.ais-news-detail {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #7b8798;
+}
+
+/* 聊天时间线 */
+.ais-chat {
+  max-height: 58vh;
+  overflow-y: auto;
+  padding: 6px 4px;
+  background: #f7f9fc;
+  border-radius: 10px;
+}
+
+.ais-chat-row {
+  display: flex;
+  margin: 9px 0;
+}
+
+.ais-chat-row.out {
+  justify-content: flex-end;
+}
+
+/* 气泡 + 署名当作一个整体，靠左/靠右由外层决定。
+   踩过的坑：把 max-width:74% 放在 .ais-chat-bubble 上时，长文本会把内层撑满整行
+   （百分比 max-width 先按整行解析），气泡于是贴在**左边**——客户中心里
+   "我方"的消息看起来像对方发的（署名在右、气泡在左）。所以宽度上限挪到这一层。 */
+.ais-chat-row > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 74%;
+  min-width: 0;
+}
+
+.ais-chat-row.out > div {
+  align-items: flex-end;
+}
+
+.ais-chat-bubble {
+  max-width: 100%;
+  padding: 9px 13px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.ais-chat-row.out .ais-chat-bubble {
+  background: linear-gradient(135deg, #e8f0ff 0%, #dfe8ff 100%);
+  border-color: #cfdcfb;
+}
+
+.ais-chat-meta {
+  font-size: 11px;
+  color: #93a0b5;
+  margin-top: 4px;
+}
+
+/* 图片墙 */
+.ais-img-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #fff;
+  transition: transform 0.15s, box-shadow 0.15s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ais-img-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.12);
+}
+
+.ais-img-thumb {
+  height: 150px;
+  background: #eef1f6 repeating-conic-gradient(#e6eaf1 0% 25%, transparent 0% 50%) 50% / 18px 18px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.ais-img-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 登录页 */
+.ais-login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(1100px 620px at 12% -10%, #33518f 0%, transparent 60%),
+    radial-gradient(900px 560px at 100% 10%, #4a3a86 0%, transparent 55%),
+    linear-gradient(160deg, #0f1729 0%, #16203a 55%, #101a30 100%);
+  padding: 24px;
+}
+
+.ais-login-panel {
+  width: 100%;
+  max-width: 940px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(6, 12, 26, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #fff;
+}
+
+.ais-login-hero {
+  padding: 42px 38px;
+  color: #fff;
+  background: linear-gradient(155deg, #1d2a49 0%, #24365f 45%, #2b2c5e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.ais-login-hero::after {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  right: -120px;
+  bottom: -140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(122, 90, 248, 0.55), transparent 70%);
+}
+
+.ais-login-hero h1 {
+  font-size: 25px;
+  margin: 18px 0 10px;
+  letter-spacing: 0.4px;
+}
+
+.ais-login-hero p {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 13px;
+  line-height: 1.9;
+  margin: 0;
+}
+
+.ais-login-feat {
+  margin-top: 22px;
+  display: grid;
+  gap: 9px;
+  position: relative;
+  z-index: 1;
+}
+
+.ais-login-feat div {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ais-login-form {
+  padding: 42px 38px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ais-muted {
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+
+@media (max-width: 860px) {
+  .ais-login-panel {
+    grid-template-columns: 1fr;
+  }
+  .ais-login-hero {
+    display: none;
+  }
+}
+
+/* ======================================================================
+ * 开发者中心 —— 复刻门户 developer 页面（科幻动效背景 + 水印横幅 + 个人卡片）
+ * 原页面用 Tailwind 变量，这里统一映射到本项目的色板；
+ * HUD 定位偏移从门户的 274px 改成我们的侧边栏宽度 216px。
+ * ==================================================================== */
+.dev-page {
+  --accent-primary: #3b82f6;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f2f4f8;
+  --border-color: #e8ecf3;
+  --text-primary: #1b2437;
+  --text-secondary: #5a6b85;
+  --text-muted: #93a0b5;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dev-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.dev-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(88, 166, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(88, 166, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.dev-bg-hud-tl,
+.dev-bg-hud-tr,
+.dev-bg-hud-bl,
+.dev-bg-hud-br {
+  position: fixed;
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+}
+.dev-bg-hud-tl {
+  top: 12px;
+  left: 228px;
+  border-top: 1px solid #3b82f6;
+  border-left: 1px solid #3b82f6;
+}
+.dev-bg-hud-tr {
+  top: 12px;
+  right: 12px;
+  border-top: 1px solid #3b82f6;
+  border-right: 1px solid #3b82f6;
+}
+.dev-bg-hud-bl {
+  bottom: 12px;
+  left: 228px;
+  border-bottom: 1px solid #3b82f6;
+  border-left: 1px solid #3b82f6;
+}
+.dev-bg-hud-br {
+  bottom: 12px;
+  right: 12px;
+  border-bottom: 1px solid #3b82f6;
+  border-right: 1px solid #3b82f6;
+}
+
+.dev-bg-scan-v {
+  position: fixed;
+  top: 0;
+  left: 228px;
+  width: 1px;
+  height: 100vh;
+  background: linear-gradient(180deg, transparent 0%, #3b82f6 50%, transparent 100%);
+  opacity: 0.12;
+  z-index: 1;
+  pointer-events: none;
+  animation: devScanV 10s linear infinite;
+}
+@keyframes devScanV {
+  0% {
+    left: 228px;
+  }
+  100% {
+    left: 100vw;
+  }
+}
+
+.dev-bg-scan-h {
+  position: fixed;
+  top: 0;
+  left: 228px;
+  width: calc(100vw - 228px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #3b82f6 50%, transparent 100%);
+  opacity: 0.08;
+  z-index: 1;
+  pointer-events: none;
+  animation: devScanH 8s linear infinite;
+}
+@keyframes devScanH {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: 100vh;
+  }
+}
+
+.dev-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #3b82f6;
+  animation: devFloat 4s ease-in-out infinite;
+}
+@keyframes devFloat {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+.dev-watermark {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.dev-watermark .wm-bg {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  opacity: 0.05;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+.dev-watermark .wm-bg .inner {
+  white-space: nowrap;
+  animation: devMarquee 20s linear infinite;
+}
+
+.dev-watermark .wm-bg .word {
+  font-size: 6rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.dev-watermark .wm-bg .sep {
+  color: var(--text-muted);
+  margin: 0 4vw;
+}
+
+.dev-watermark .wm-content {
+  position: relative;
+  z-index: 10;
+  padding: 24px 28px;
+}
+
+.dev-watermark .wm-content h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.dev-watermark .wm-bar {
+  margin-top: 8px;
+  height: 2px;
+  width: 64px;
+  background: var(--accent-primary);
+  border-radius: 2px;
+}
+
+@keyframes devMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.artistic-char {
+  display: inline-block;
+  background: linear-gradient(120deg, #22d3ee, #34d399, #fbbf24, #a78bfa, #f87171, #22d3ee);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent !important;
+  text-shadow: 0 0 18px rgba(34, 211, 238, 0.35);
+  animation: artisticFlow 5s linear infinite;
+}
+@keyframes artisticFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 300% 50%;
+  }
+}
+
+.dev-card {
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  padding: 40px;
+  text-align: center;
+}
+
+.dev-avatar-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.dev-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #22d3ee, #3b82f6, #a78bfa);
+  background-size: 200% 200%;
+  animation: avatarGlow 3s ease-in-out infinite;
+  box-shadow: 0 0 0 6px rgba(88, 166, 255, 0.15), 0 8px 24px rgba(34, 211, 238, 0.25);
+  position: relative;
+  z-index: 1;
+  object-fit: cover;
+}
+
+@keyframes avatarGlow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 0 6px rgba(88, 166, 255, 0.15), 0 8px 24px rgba(34, 211, 238, 0.25);
+  }
+  50% {
+    background-position: 100% 50%;
+    box-shadow: 0 0 0 8px rgba(88, 166, 255, 0.3), 0 12px 32px rgba(167, 139, 250, 0.3);
+  }
+}
+
+.dev-avatar-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px dashed var(--accent-primary);
+  opacity: 0.3;
+  animation: ringSpin 8s linear infinite;
+}
+@keyframes ringSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.dev-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s;
+  margin: 0 6px;
+}
+.dev-link-btn:hover {
+  transform: translateY(-2px);
+}
+.dev-link-btn.gh {
+  background: #24292e;
+}
+.dev-link-btn.gh:hover {
+  background: #1a1f24;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.dev-link-btn.blog {
+  background: var(--accent-primary);
+}
+.dev-link-btn.blog:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.dev-tech-tag {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  transition: all 0.3s;
+}
+.dev-tech-tag:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.dev-blog-card {
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+}
+
+.dev-blog-card .blog-header {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dev-blog-card .blog-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.dev-blog-card .blog-header a {
+  font-size: 12px;
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+.dev-blog-card .iframe-wrap {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
+  background: #0f1729;
+}
+
+.dev-blog-card .iframe-wrap iframe {
+  width: 133.333%;
+  height: 600px;
+  border: none;
+  display: block;
+  transform: scale(0.75);
+  transform-origin: top left;
+}
+
+.dev-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+.dev-back-link:hover {
+  opacity: 0.8;
+}

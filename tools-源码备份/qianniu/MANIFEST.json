@@ -1,0 +1,68 @@
+{
+  "stage": "功能区块开发中",
+  "integrationStatus": "待集成到系统",
+  "version": "v0.1",
+  "entry": "blocks/index.mjs",
+  "note": "系统只依赖 entry；CLI(im.mjs) 与探针(probe-*) 不进系统。接口可用 node list-api.mjs 重新导出核对。",
+  "blocks": [
+    { "id": "session",      "file": "blocks/session.mjs",      "title": "会话通道",   "status": "待集成", "dependsOn": ["cdp-lib.mjs"] },
+    { "id": "messages",     "file": "blocks/messages.mjs",     "title": "消息",       "status": "待集成", "dependsOn": ["session"] },
+    { "id": "conversations","file": "blocks/conversations.mjs","title": "会话列表",   "status": "待集成", "dependsOn": ["session"] },
+    { "id": "input",        "file": "blocks/input.mjs",        "title": "输入发送",   "status": "待集成", "dependsOn": ["session"] },
+    { "id": "phrases",      "file": "blocks/phrases.mjs",      "title": "快捷短语",   "status": "待集成", "dependsOn": ["session", "input"] },
+    { "id": "reply",        "file": "blocks/reply.mjs",        "title": "回复引擎",   "status": "待集成（条件规则待补）", "dependsOn": ["session", "input", "phrases", "db"] },
+    { "id": "monitor",      "file": "blocks/monitor.mjs",      "title": "事件监听",   "status": "待集成", "dependsOn": ["session", "messages", "conversations", "reply", "db", "logstore"] },
+    { "id": "db",           "file": "blocks/db.mjs",           "title": "数据落库",   "status": "待集成", "dependsOn": [] },
+    { "id": "logstore",     "file": "blocks/logstore.mjs",     "title": "事件日志",   "status": "待集成", "dependsOn": [] },
+    { "id": "imageSearch",  "file": "blocks/image-search.mjs", "title": "以图搜图",   "status": "待集成", "dependsOn": ["session"] },
+    { "id": "outreach",     "file": "blocks/outreach.mjs",     "title": "联系商家",   "status": "待集成", "dependsOn": ["session", "db", "imageSearch", "phraseSend", "tabs", "cdp-lib.mjs"] },
+    { "id": "library",      "file": "blocks/library.mjs",      "title": "短语库",     "status": "待集成", "dependsOn": ["db"] },
+    { "id": "phraseSend",   "file": "blocks/phrase-send.mjs",  "title": "图文发送",   "status": "待集成", "dependsOn": ["session", "input", "db", "library"] },
+    { "id": "tabs",         "file": "blocks/tabs.mjs",         "title": "标签治理",   "status": "待集成", "dependsOn": ["cdp-lib.mjs"] },
+    { "id": "ai",           "file": "blocks/ai.mjs",           "title": "AI 解析与回复", "status": "待集成（用 DeepSeek-V4.1-Flash）", "dependsOn": ["db"] },
+    { "id": "autoReply",    "file": "blocks/auto-reply.mjs",   "title": "多会话自动回复", "status": "待集成（三档：演练/草稿/真发，默认演练）", "dependsOn": ["session", "ai", "input", "db", "tabs"] },
+    { "id": "sweep",        "file": "blocks/sweep.mjs",        "title": "全量抓历史", "status": "待集成", "dependsOn": ["session", "db", "autoReply", "tabs"] },
+    { "id": "imageLibrary", "file": "blocks/image-library.mjs", "title": "图片库",   "status": "待集成（本地文件夹 / 可替换为接口）", "dependsOn": ["db"] },
+    { "id": "campaign",     "file": "blocks/campaign.mjs",     "title": "比价任务（整条链路入口）", "status": "待集成（并行隔离单位）", "dependsOn": ["db", "library", "imageSearch", "outreach", "autoReply", "session"] },
+    { "id": "scheduler",    "file": "blocks/scheduler.mjs",    "title": "多任务调度器", "status": "待集成（一个终端同时推进多个任务）", "dependsOn": ["campaign", "db", "outreach", "library"] },
+    { "id": "lock",         "file": "blocks/lock.mjs",         "title": "浏览器操作锁", "status": "待集成（防多进程互抢窗口）", "dependsOn": [] }
+  ],
+  "scripts": [
+    { "file": "im.mjs",         "role": "CLI 薄壳（开发/人工操作用）", "inSystem": false },
+    { "file": "selftest.mjs",   "role": "逐区块自测",                 "inSystem": false },
+    { "file": "start-im.ps1",   "role": "启动器（保证 CDP + 常驻监听）", "inSystem": false },
+    { "file": "list-api.mjs",   "role": "导出区块接口",               "inSystem": false }
+  ],
+  "infra": [
+    { "file": "cdp-lib.mjs", "role": "CDP 连接/标签管理/超时兜底" },
+    { "file": "cdp.mjs",     "role": "通用 CDP 调试命令" }
+  ],
+  "probes": {
+    "role": "一次性诊断探针，不进系统",
+    "files": [
+      "probe.js", "probe-chat.js", "probe-bridge.js", "probe-ui.js", "probe-tools.js",
+      "probe-msgitem.js", "probe-convitem.js", "probe-conv-id.js", "probe-selfids.js",
+      "probe-iself.js", "probe-webim.js", "probe-search.js", "probe-imageresults.js",
+      "probe-selector-check.js", "probe-card-links.js", "probe-extract.js",
+      "probe-upload-signal.mjs", "probe-upload-net.mjs", "probe-imageid-api.mjs",
+      "probe-block-check.mjs", "probe-phrase-state.mjs", "controller.js", "inject-test.js"
+    ]
+  },
+  "data": {
+    "db": "data/im.db",
+    "tables": ["conversations", "messages", "events", "heartbeats", "replies", "image_searches", "image_contacts", "phrase_library", "phrase_sends", "supplier_quotes", "auto_replies", "image_library", "offer_prices", "campaigns"],
+    "csv": "data/messages.csv",
+    "eventsJsonl": "logs/im-events.jsonl",
+    "monitorLog": "logs/monitor.out.log",
+    "rules": "rules.example.json",
+    "phrases": "phrase-library.json",
+    "images": "image/"
+  },
+  "todos": [
+    { "item": "回复条件规则（议价/比价/客户等级）", "status": "等业务条件" },
+    { "item": "图片库对接（按 image_id 查商家）", "status": "等图片库" },
+    { "item": "价格追踪（同 imageId 隔期 diff）", "status": "待开发" },
+    { "item": "多会话自动回复（sweep 切换会话）", "status": "待开发" },
+    { "item": "全量历史抓取", "status": "待开发" }
+  ]
+}

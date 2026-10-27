@@ -1,0 +1,23 @@
+{
+  "_说明": "快捷短语库：一条短语 = 一段文字 + 一张图（图片可留空）。改完跑 node im.mjs lib sync 同步进数据库。",
+  "_注意": "聊天框的贴图按钮是『点了就发』，没有预览确认；所以图文短语会作为两条消息发出（默认先文字、后图片，可用 --order 调整）。",
+  "version": 1,
+  "phrases": [
+    {
+      "id": "ask-custom-price",
+      "name": "询价：定制价格",
+      "text": "这个定制什么价格",
+      "image": "tools/qianniu/image/LuminousMemories.jpg",
+      "tags": ["询价", "定制"],
+      "enabled": true
+    },
+    {
+      "id": "ask-custom-price2",
+      "name": "询价：采购价格",
+      "text": "金色羽毛笔,黑色笔芯,0.5针管,要400支,每支笔单独套一个opp袋子,算下价格",
+      "image": "tools/qianniu/image/羽毛笔.jpg",
+      "tags": ["询价", "羽毛笔"],
+      "enabled": true
+    }
+  ]
+}

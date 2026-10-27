@@ -1,0 +1,40 @@
+{
+  "_说明": "回复规则示例。复制成 rules.json 后按需修改；条件是后续补充的重点，现在先给了关键词/正则两类。",
+  "_护栏": "dryRun=true 时只走流程不真发；改 false 才真发。draftOnly=true 只填输入框等人工点发送。",
+  "guards": {
+    "dryRun": true,
+    "draftOnly": false,
+    "minIntervalMs": 8000,
+    "maxPerHour": 30,
+    "maxPerConvPerHour": 10,
+    "dedupeWindowMs": 3600000,
+    "quietHours": null,
+    "maxLength": 500
+  },
+  "rules": [
+    {
+      "name": "询价：问价格",
+      "enabled": true,
+      "match": { "keywordsAny": ["多少钱", "什么价格", "怎么卖", "报价", "价格"] },
+      "reply": { "text": "您好，我们在做比价，麻烦报一下含税单价和起订量，谢谢！" }
+    },
+    {
+      "name": "询价：问起订量",
+      "enabled": true,
+      "match": { "keywordsAll": ["起批", "多少"] },
+      "reply": { "text": "请问最小起订量是多少？大货和小单的价格分别是多少？" }
+    },
+    {
+      "name": "打招呼",
+      "enabled": false,
+      "match": { "regex": "在吗|在不在|有人吗" },
+      "reply": { "text": "在的，请问有什么可以帮您？" }
+    },
+    {
+      "name": "使用快捷短语（示例：用第 0 条短语回复）",
+      "enabled": false,
+      "match": { "any": true },
+      "reply": { "phraseIndex": 0 }
+    }
+  ]
+}
